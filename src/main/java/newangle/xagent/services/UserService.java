@@ -24,7 +24,6 @@ public class UserService {
 
     private void updateUserInfo(User user, User u) {
         user.setName(u.getName());
-        user.setUsername(u.getUsername());
         user.setEmail(u.getEmail());
         user.setPassword(u.getPassword());
         user.setPhoneNumber(u.getPhoneNumber());
