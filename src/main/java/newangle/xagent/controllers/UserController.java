@@ -10,6 +10,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import newangle.xagent.entities.User;
 import newangle.xagent.services.UserService;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -33,6 +34,12 @@ public class UserController {
     public ResponseEntity<User> updateUserInfo(@PathVariable Long id, @RequestBody User user) {
         user = service.updateUser(id, user);
         return ResponseEntity.ok().body(user);
+    }
+
+    @DeleteMapping(value="delete-account/{id}")
+    public ResponseEntity<User> deleteUser(@PathVariable Long id) {
+        service.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

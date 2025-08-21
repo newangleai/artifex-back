@@ -22,6 +22,10 @@ public class UserService {
         return repository.save(user);
     }
 
+    public void deleteUser(Long id) {
+        repository.deleteById(id);
+    }
+
     private void updateUserInfo(User user, User u) {
         user.setName(u.getName());
         user.setEmail(u.getEmail());
