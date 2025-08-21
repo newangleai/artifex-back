@@ -1,12 +1,14 @@
 package newangle.xagent.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import newangle.xagent.entities.User;
 import newangle.xagent.repositories.UserRepository;
+import newangle.xagent.services.exceptions.ResourceNotFound;
 
 @Service
 public class UserService {
@@ -17,6 +19,11 @@ public class UserService {
     public List<User> findAll() {
         return repository.findAll();
     }
+
+    public User findById(Long id) {
+		Optional<User> obj = repository.findById(id);
+		return obj.orElseThrow(() -> new ResourceNotFound(id));
+	}
     
     public User createUser(User user) {
         return repository.save(user);
