@@ -1,6 +1,7 @@
 package newangle.xagent.controllers;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import newangle.xagent.entities.User;
 import newangle.xagent.services.UserService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -22,6 +24,12 @@ public class UserController {
     
     @Autowired
     private UserService service;
+
+    @GetMapping(value="/users")
+	public ResponseEntity<List<User>> findAll() {
+		List<User> list = service.findAll();
+		return ResponseEntity.ok().body(list);
+	}
 
     @PostMapping(value="/sign-up")
     public ResponseEntity<User> createUser(@RequestBody User user) {

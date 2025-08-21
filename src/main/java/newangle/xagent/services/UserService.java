@@ -1,5 +1,7 @@
 package newangle.xagent.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +13,10 @@ public class UserService {
 
     @Autowired
     private UserRepository repository;
+
+    public List<User> findAll() {
+        return repository.findAll();
+    }
     
     public User createUser(User user) {
         return repository.save(user);
@@ -22,15 +28,15 @@ public class UserService {
         return repository.save(user);
     }
 
-    public void deleteUser(Long id) {
-        repository.deleteById(id);
-    }
-
     private void updateUserInfo(User user, User u) {
         user.setName(u.getName());
         user.setEmail(u.getEmail());
         user.setPassword(u.getPassword());
         user.setPhoneNumber(u.getPhoneNumber());
+    }
+
+    public void deleteUser(Long id) {
+        repository.deleteById(id);
     }
 
 }
