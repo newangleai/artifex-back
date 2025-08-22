@@ -43,4 +43,16 @@ public class AiAgentService {
         aiAgentrepository.deleteById(id);
     }
 
+    public AiAgent updateAgent(UUID id, AiAgent aiAgent) {
+        AiAgent agent = aiAgentrepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFound(id));
+        updateAgentInfo(agent, aiAgent);
+        return aiAgentrepository.save(agent);
+    }
+
+    private void updateAgentInfo(AiAgent agent, AiAgent aiAgent) {
+        agent.setName(aiAgent.getName());
+        agent.setDescription(aiAgent.getDescription());
+    }
+
 }
