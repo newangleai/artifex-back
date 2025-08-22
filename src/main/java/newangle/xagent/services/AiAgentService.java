@@ -1,10 +1,14 @@
 package newangle.xagent.services;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import newangle.xagent.repositories.AiAgentRepository;
 import newangle.xagent.repositories.UserRepository;
+import newangle.xagent.services.exceptions.ResourceNotFound;
 import newangle.xagent.entities.AiAgent;
 import newangle.xagent.entities.User;
 
@@ -12,7 +16,7 @@ import newangle.xagent.entities.User;
 public class AiAgentService {
     
     @Autowired
-    private AiAgentRepository repository;
+    private AiAgentRepository aiAgentrepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -27,7 +31,12 @@ public class AiAgentService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
 
         aiAgent.setUser(user);
-        return repository.save(aiAgent);
+        return aiAgentrepository.save(aiAgent);
+    }
+
+    public AiAgent findById(UUID id) {
+        Optional<AiAgent> obj = aiAgentrepository.findById(id);
+        return obj.orElseThrow(() -> new ResourceNotFound(id));
     }
 
 }

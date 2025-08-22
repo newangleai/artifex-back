@@ -1,9 +1,12 @@
 package newangle.xagent.controllers;
 
 import java.net.URI;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +26,12 @@ public class AiAgentController {
         aiAgent = service.create(aiAgent);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(aiAgent.getId()).toUri();
         return ResponseEntity.created(uri).body(aiAgent);
+    }
+
+    @GetMapping(value="/agents/{id}")
+    public ResponseEntity<AiAgent> findById(@PathVariable UUID id) {
+        AiAgent aiAgent = service.findById(id);
+        return ResponseEntity.ok().body(aiAgent);
     }
 
 }
