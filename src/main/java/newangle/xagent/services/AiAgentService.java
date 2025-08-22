@@ -39,4 +39,8 @@ public class AiAgentService {
         return obj.orElseThrow(() -> new ResourceNotFound(id));
     }
 
+    public void deleteAgent(UUID id) {
+        aiAgentrepository.deleteById(id);
+    }
+
 }
