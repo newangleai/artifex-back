@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import newangle.xagent.entities.User;
+import newangle.xagent.domain.user.User;
 import newangle.xagent.repositories.UserRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

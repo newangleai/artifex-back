@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import newangle.xagent.entities.User;
+import newangle.xagent.domain.user.User;
 import newangle.xagent.services.UserService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;

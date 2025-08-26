@@ -1,4 +1,4 @@
-package newangle.xagent.entities;
+package newangle.xagent.domain.agent;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import newangle.xagent.domain.user.User;
 
 @NoArgsConstructor
 @AllArgsConstructor

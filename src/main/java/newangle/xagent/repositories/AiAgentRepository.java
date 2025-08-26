@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import newangle.xagent.entities.AiAgent;
+import newangle.xagent.domain.agent.AiAgent;
 
 public interface AiAgentRepository extends JpaRepository<AiAgent, UUID> {
     

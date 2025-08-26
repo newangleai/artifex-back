@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import newangle.xagent.entities.User;
+import newangle.xagent.domain.user.User;
 import newangle.xagent.repositories.UserRepository;
 import newangle.xagent.services.exceptions.ResourceNotFound;
 

@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import newangle.xagent.repositories.AiAgentRepository;
 import newangle.xagent.repositories.UserRepository;
 import newangle.xagent.services.exceptions.ResourceNotFound;
-import newangle.xagent.entities.AiAgent;
-import newangle.xagent.entities.User;
+import newangle.xagent.domain.agent.AiAgent;
+import newangle.xagent.domain.user.User;
 
 @Service
 public class AiAgentService {
