@@ -44,6 +44,12 @@ public class User implements UserDetails {
     private String phoneNumber;
     private UserRole role;
 
+    public User(String username, String password, UserRole role) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
+
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
