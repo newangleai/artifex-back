@@ -2,8 +2,10 @@ package newangle.xagent.controllers;
 
 import newangle.xagent.domain.user.AuthenticationDTO;
 import newangle.xagent.domain.user.RegisterDTO;
+import newangle.xagent.domain.user.SignInResponseDTO;
 import newangle.xagent.domain.user.User;
 import newangle.xagent.repositories.UserRepository;
+import newangle.xagent.security.TokenService;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +26,17 @@ public class AuthenticationController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private TokenService tokenService;
+
     @PostMapping("/sign-in")
-    public ResponseEntity signIn(@RequestBody AuthenticationDTO data) {
+    public ResponseEntity<SignInResponseDTO> signIn(@RequestBody AuthenticationDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
 
-        return ResponseEntity.ok().build();
+        var token = tokenService.generateToken((User) auth.getPrincipal());
+
+        return ResponseEntity.ok(new SignInResponseDTO(token));
     }
 
     @PostMapping("/sign-up")
