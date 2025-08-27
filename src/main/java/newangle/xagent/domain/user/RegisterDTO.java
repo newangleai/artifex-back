@@ -1,5 +1,5 @@
 package newangle.xagent.domain.user;
 
-public record RegisterDTO(String username, String password, UserRole role) {
+public record RegisterDTO(String username, String email, String phoneNumber, String password) {
     
 }

@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import newangle.xagent.domain.user.UserRole;
 import newangle.xagent.domain.user.User;
 import newangle.xagent.repositories.UserRepository;
 import newangle.xagent.services.exceptions.ResourceNotFound;
@@ -15,6 +17,9 @@ public class UserService {
 
     @Autowired
     private UserRepository repository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<User> findAll() {
         return repository.findAll();
@@ -26,6 +31,12 @@ public class UserService {
 	}
     
     public User createUser(User user) {
+        return repository.save(user);
+    }
+
+    public User createUser(String username, String rawPassword) {
+        String encodedPassword = passwordEncoder.encode(rawPassword);
+        User user = new User(username, encodedPassword, UserRole.USER);
         return repository.save(user);
     }
 
