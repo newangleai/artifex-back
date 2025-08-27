@@ -30,7 +30,6 @@ class UserServiceTest {
     void setUp() {
         userTest = new User();
         userTest.setId(userId);
-        userTest.setName("Name");
         userTest.setEmail("email@email.com");
         userTest.setPassword("password");
         userTest.setPhoneNumber("123456789");
@@ -44,7 +43,6 @@ class UserServiceTest {
         Long userId = 1L;
 
         User updatedInfo = new User();
-        updatedInfo.setName("New Name");
         updatedInfo.setEmail("newemail@email.com");
         updatedInfo.setPassword("newpassword");
         updatedInfo.setPhoneNumber("987654321");
@@ -66,7 +64,6 @@ class UserServiceTest {
         assertNotNull(resultUser);
 
         assertEquals(userId, resultUser.getId()); // O ID deve permanecer o mesmo
-        assertEquals("New Name", resultUser.getName());
         assertEquals("newemail@email.com", resultUser.getEmail());
         assertEquals("newpassword", resultUser.getPassword());
         assertEquals("987654321", resultUser.getPhoneNumber());
