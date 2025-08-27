@@ -34,9 +34,9 @@ public class UserService {
         return repository.save(user);
     }
 
-    public User createUser(String username, String rawPassword) {
+    public User createUser(String username, String rawPassword, String email, String phoneNumber) {
         String encodedPassword = passwordEncoder.encode(rawPassword);
-        User user = new User(username, encodedPassword, UserRole.USER);
+        User user = new User(username, encodedPassword, email, phoneNumber, UserRole.USER);
         return repository.save(user);
     }
 

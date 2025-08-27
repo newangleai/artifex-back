@@ -45,7 +45,7 @@ public class AuthenticationController {
     public ResponseEntity<User> signUp(@RequestBody RegisterDTO data) {
         if (this.userRepository.findByUsername(data.username()) != null) return ResponseEntity.badRequest().build();
 
-        userService.createUser(data.username(), data.password());
+        userService.createUser(data.username(), data.password(), data.email(), data.phoneNumber());
 
         return ResponseEntity.ok().build();
     }
