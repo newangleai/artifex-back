@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import newangle.xagent.repositories.AiAgentRepository;
 import newangle.xagent.repositories.UserRepository;
-import newangle.xagent.services.exceptions.ResourceNotFound;
+import newangle.xagent.services.exceptions.ResourceNotFoundException;
 import newangle.xagent.domain.agent.AiAgent;
 import newangle.xagent.domain.user.User;
 
@@ -36,7 +36,7 @@ public class AiAgentService {
 
     public AiAgent findById(UUID id) {
         Optional<AiAgent> obj = aiAgentrepository.findById(id);
-        return obj.orElseThrow(() -> new ResourceNotFound(id));
+        return obj.orElseThrow(() -> new ResourceNotFoundException(id));
     }
 
     public void deleteAgent(UUID id) {
@@ -45,7 +45,7 @@ public class AiAgentService {
 
     public AiAgent updateAgent(UUID id, AiAgent aiAgent) {
         AiAgent agent = aiAgentrepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFound(id));
+                .orElseThrow(() -> new ResourceNotFoundException(id));
         updateAgentInfo(agent, aiAgent);
         return aiAgentrepository.save(agent);
     }
