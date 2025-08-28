@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 public class UserController {
@@ -35,12 +35,14 @@ public class UserController {
 	}
 
     @PutMapping(value="/users/update-account/{id}")
+    @PreAuthorize("#id == principal.id or hasRole('ADMIN')")
     public ResponseEntity<User> updateUserInfo(@PathVariable Long id, @RequestBody User user) {
         user = service.updateUser(id, user);
         return ResponseEntity.ok().body(user);
     }
 
     @DeleteMapping(value="/users/delete-account/{id}")
+    @PreAuthorize("#id == principal.id or hasRole('ADMIN')")
     public ResponseEntity<User> deleteUser(@PathVariable Long id) {
         service.deleteUser(id);
         return ResponseEntity.noContent().build();
