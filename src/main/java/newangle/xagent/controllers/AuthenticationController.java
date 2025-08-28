@@ -1,14 +1,18 @@
 package newangle.xagent.controllers;
 
-import newangle.xagent.domain.user.AuthenticationDTO;
-import newangle.xagent.domain.user.RegisterDTO;
-import newangle.xagent.domain.user.SignInResponseDTO;
 import newangle.xagent.domain.user.User;
-import newangle.xagent.repositories.UserRepository;
+import newangle.xagent.domain.user.dto.AuthenticationDTO;
+import newangle.xagent.domain.user.dto.RegisterDTO;
+import newangle.xagent.domain.user.dto.SignInResponseDTO;
+import newangle.xagent.domain.user.dto.SignUpResponseDTO;
 import newangle.xagent.security.TokenService;
 import newangle.xagent.services.UserService;
 
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,21 +27,23 @@ public class AuthenticationController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private TokenService tokenService;
 
     @Autowired
     private UserService userService;
 
     @PostMapping("/sign-up")
-    public ResponseEntity<User> signUp(@RequestBody RegisterDTO data) {
-        if (this.userRepository.findByUsername(data.username()) != null) return ResponseEntity.badRequest().build();
+    public ResponseEntity<SignUpResponseDTO> signUp(@RequestBody RegisterDTO data) {
+        User newUser = userService.createUser(data);
 
-        userService.createUser(data.username(), data.password(), data.email(), data.phoneNumber());
+        URI uri = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(newUser.getId()).toUri();
 
-        return ResponseEntity.ok().build();
+        SignUpResponseDTO signUpResponseDTO = new SignUpResponseDTO(newUser);
+
+        return ResponseEntity.created(uri).body(signUpResponseDTO);
     }
 
     @PostMapping("/sign-in")

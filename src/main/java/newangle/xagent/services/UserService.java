@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import newangle.xagent.domain.user.UserRole;
+import newangle.xagent.domain.user.dto.RegisterDTO;
 import newangle.xagent.domain.user.User;
 import newangle.xagent.repositories.UserRepository;
 import newangle.xagent.services.exceptions.ResourceNotFoundException;
@@ -30,21 +31,17 @@ public class UserService {
 		Optional<User> obj = userRepository.findById(id);
 		return obj.orElseThrow(() -> new ResourceNotFoundException(id));
 	}
-    
-    public User createUser(User user) {
-        return userRepository.save(user);
-    }
 
-    public User createUser(String username, String rawPassword, String email, String phoneNumber) {
-        if (userRepository.existsByUsername(username)) {
-            throw new UserAlreadyExistsException("Conflict: Username '" + username + "' already in use.");
+    public User createUser(RegisterDTO data) {
+        if (userRepository.existsByUsername(data.username())) {
+            throw new UserAlreadyExistsException("Conflict: Username '" + data.username() + "' already in use.");
         }
-        if (userRepository.existsByEmail(email)) {
-            throw new UserAlreadyExistsException("Conflict: Email '" + email + "' already in use.");
+        if (userRepository.existsByEmail(data.email())) {
+            throw new UserAlreadyExistsException("Conflict: Email '" + data.email() + "' already in use.");
         }
 
-        String encodedPassword = passwordEncoder.encode(rawPassword);
-        User user = new User(username, encodedPassword, email, phoneNumber, UserRole.USER);
+        String encodedPassword = passwordEncoder.encode(data.password());
+        User user = new User(data.username(), encodedPassword, data.email(), data.phoneNumber(), UserRole.USER);
 
         return userRepository.save(user);
     }
