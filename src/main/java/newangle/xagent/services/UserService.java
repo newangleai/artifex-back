@@ -54,7 +54,14 @@ public class UserService {
 
     private void updateUserInfo(User user, User u) {
         user.setEmail(u.getEmail());
-        user.setPassword(u.getPassword());
+        // Only update password if a new non-blank value is provided.
+        // Re-hash the new password before saving. Avoid double-encoding by checking matches.
+        if (u.getPassword() != null && !u.getPassword().isBlank()) {
+            // If the provided raw password already matches the stored hash, do nothing.
+            if (!passwordEncoder.matches(u.getPassword(), user.getPassword())) {
+                user.setPassword(passwordEncoder.encode(u.getPassword()));
+            }
+        }
         user.setPhoneNumber(u.getPhoneNumber());
     }
 
