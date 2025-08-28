@@ -31,7 +31,6 @@ public class SecurityConfigurations {
                 .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers(HttpMethod.POST, "/sign-up").permitAll()
                     .requestMatchers(HttpMethod.POST, "/sign-in").permitAll()
-                    // .requestMatchers(HttpMethod.GET, "/users/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
