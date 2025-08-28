@@ -31,6 +31,15 @@ public class AuthenticationController {
     @Autowired
     private UserService userService;
 
+    @PostMapping("/sign-up")
+    public ResponseEntity<User> signUp(@RequestBody RegisterDTO data) {
+        if (this.userRepository.findByUsername(data.username()) != null) return ResponseEntity.badRequest().build();
+
+        userService.createUser(data.username(), data.password(), data.email(), data.phoneNumber());
+
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/sign-in")
     public ResponseEntity<SignInResponseDTO> signIn(@RequestBody AuthenticationDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
@@ -39,15 +48,6 @@ public class AuthenticationController {
         var token = tokenService.generateToken((User) auth.getPrincipal());
 
         return ResponseEntity.ok(new SignInResponseDTO(token));
-    }
-
-    @PostMapping("/sign-up")
-    public ResponseEntity<User> signUp(@RequestBody RegisterDTO data) {
-        if (this.userRepository.findByUsername(data.username()) != null) return ResponseEntity.badRequest().build();
-
-        userService.createUser(data.username(), data.password(), data.email(), data.phoneNumber());
-
-        return ResponseEntity.ok().build();
     }
     
 }
