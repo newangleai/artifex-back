@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -37,7 +38,10 @@ public class User implements UserDetails {
     private Long id;
     private String username;
     private String email;
+
+    @JsonIgnore
     private String password;
+    
     private String phoneNumber;
     private UserRole role;
 
