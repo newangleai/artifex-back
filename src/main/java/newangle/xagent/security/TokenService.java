@@ -15,17 +15,27 @@ import newangle.xagent.domain.user.User;
 @Service
 public class TokenService {
 
-    @Value("${api.security.token.secret}")
+    @Value("${JWT_SECRET:${api.security.token.secret}}")
     private String secret;
 
-    @Value("${api.security.token.expiration-hours}")
+    @Value("${api.security.token.expiration-hours:24}")
     private long expirationHours;
+
+    @Value("${JWT_ISSUER:${api.security.token.issuer:x-agent}}")
+    private String issuer;
+
+    @Value("${JWT_AUDIENCE:${api.security.token.audience:xagent-users}}")
+    private String audience;
+
+    @Value("${JWT_LEEWAY_SECONDS:${api.security.token.leeway-seconds:60}}")
+    private long leewaySeconds;
     
     public String generateToken(User user) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             String token = JWT.create()
-                            .withIssuer("x-agent")
+                            .withIssuer(issuer)
+                            .withAudience(audience)
                             .withSubject(user.getUsername())
                             .withClaim("userId", user.getId())
                             .withExpiresAt(generateExpirationDate())
@@ -41,7 +51,9 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.require(algorithm)
-                    .withIssuer("x-agent")
+                    .withIssuer(issuer)
+                    .withAudience(audience)
+                    .acceptLeeway(leewaySeconds)
                     .build()
                     .verify(token)
                     .getSubject();
