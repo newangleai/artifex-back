@@ -19,6 +19,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import jakarta.validation.Valid;
 
 @RestController
 public class AuthenticationController {
@@ -33,7 +34,7 @@ public class AuthenticationController {
     private UserService userService;
 
     @PostMapping("/sign-up")
-    public ResponseEntity<SignUpResponseDTO> signUp(@RequestBody RegisterDTO data) {
+    public ResponseEntity<SignUpResponseDTO> signUp(@RequestBody @Valid RegisterDTO data) {
         User newUser = userService.createUser(data);
 
         URI uri = ServletUriComponentsBuilder
@@ -47,7 +48,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<SignInResponseDTO> signIn(@RequestBody AuthenticationDTO data) {
+    public ResponseEntity<SignInResponseDTO> signIn(@RequestBody @Valid AuthenticationDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
 
