@@ -28,6 +28,9 @@ public class SecurityConfigurations {
     @Autowired
     private SecurityFilter securityFilter;
     
+    @Autowired
+    private RateLimitingFilter rateLimitingFilter;
+    
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -44,6 +47,7 @@ public class SecurityConfigurations {
                     .frameOptions(frame -> frame.sameOrigin())
                     .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'none'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; connect-src 'self'; img-src 'self'; script-src 'self'; style-src 'self';"))
                 )
+                .addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import jakarta.servlet.http.HttpServletRequest;
+import newangle.xagent.services.exceptions.TooManyRequestsException;
 import newangle.xagent.services.exceptions.UserAlreadyExistsException;
 
 @ControllerAdvice
-public class ResourceExceptionHandler {
+public class ControllerExceptionHandler {
     
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<StandardError> badRequest(HttpMessageNotReadableException e, HttpServletRequest request) {
@@ -67,6 +68,14 @@ public class ResourceExceptionHandler {
         });
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(TooManyRequestsException.class)
+    public ResponseEntity<Object> handleTooManyRequests(TooManyRequestsException e, HttpServletRequest request) {
+        String error = "Too many requests";
+        HttpStatus status = HttpStatus.TOO_MANY_REQUESTS;
+        StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+		return ResponseEntity.status(status).body(err);
     }
 
 }

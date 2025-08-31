@@ -5,8 +5,10 @@ import newangle.xagent.domain.user.dto.AuthenticationDTO;
 import newangle.xagent.domain.user.dto.RegisterDTO;
 import newangle.xagent.domain.user.dto.SignInResponseDTO;
 import newangle.xagent.domain.user.dto.SignUpResponseDTO;
-import newangle.xagent.security.TokenService;
 import newangle.xagent.services.UserService;
+import newangle.xagent.services.exceptions.TooManyRequestsException;
+import newangle.xagent.services.security.LoginAttemptService;
+import newangle.xagent.services.security.TokenService;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -19,6 +21,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -32,6 +35,9 @@ public class AuthenticationController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private LoginAttemptService loginAttemptService;
 
     @PostMapping("/sign-up")
     public ResponseEntity<SignUpResponseDTO> signUp(@RequestBody @Valid RegisterDTO data) {
@@ -48,13 +54,27 @@ public class AuthenticationController {
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<SignInResponseDTO> signIn(@RequestBody @Valid AuthenticationDTO data) {
+    public ResponseEntity<SignInResponseDTO> signIn(@RequestBody @Valid AuthenticationDTO data, HttpServletRequest request) {
+        String ip = resolveClientIp(request);
+
+        if (loginAttemptService.isIpBlocked(ip) || loginAttemptService.isUsernameBlocked(data.username()) || loginAttemptService.isIpRateLimited(ip)) {
+            throw new TooManyRequestsException("We were unable to process your request at this time. Try again later.");
+        }
+
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
 
         var token = tokenService.generateToken((User) auth.getPrincipal());
 
         return ResponseEntity.ok(new SignInResponseDTO(token));
+    }
+
+    private String resolveClientIp(HttpServletRequest request) {
+        String xf = request.getHeader("X-Forwarded-For");
+        if (xf != null && !xf.isBlank()) {
+            return xf.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
     
 }
