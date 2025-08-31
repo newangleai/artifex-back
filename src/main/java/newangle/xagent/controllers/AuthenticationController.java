@@ -9,6 +9,8 @@ import newangle.xagent.services.UserService;
 import newangle.xagent.services.exceptions.TooManyRequestsException;
 import newangle.xagent.services.security.LoginAttemptService;
 import newangle.xagent.services.security.TokenService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -39,6 +41,8 @@ public class AuthenticationController {
     @Autowired
     private LoginAttemptService loginAttemptService;
 
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
+
     @PostMapping("/sign-up")
     public ResponseEntity<SignUpResponseDTO> signUp(@RequestBody @Valid RegisterDTO data) {
         User newUser = userService.createUser(data);
@@ -49,6 +53,9 @@ public class AuthenticationController {
             .buildAndExpand(newUser.getId()).toUri();
 
         SignUpResponseDTO signUpResponseDTO = new SignUpResponseDTO(newUser);
+
+        // Audit: user signed up
+        log.info("audit.auth.signup userId={} username={} email={}", newUser.getId(), newUser.getUsername(), newUser.getEmail());
 
         return ResponseEntity.created(uri).body(signUpResponseDTO);
     }
@@ -65,6 +72,9 @@ public class AuthenticationController {
         var auth = this.authenticationManager.authenticate(usernamePassword);
 
         var token = tokenService.generateToken((User) auth.getPrincipal());
+
+        // Audit: sign-in success (do not log token)
+        log.info("audit.auth.signin.success username={} ip={}", data.username(), ip);
 
         return ResponseEntity.ok(new SignInResponseDTO(token));
     }

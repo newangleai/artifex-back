@@ -3,7 +3,11 @@ package newangle.xagent.services;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +26,8 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     public List<User> findAll() {
         return userRepository.findAll();
@@ -43,13 +49,28 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(data.password());
         User user = new User(data.username(), encodedPassword, data.email(), data.phoneNumber(), UserRole.USER);
 
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        // Audit: user created (no sensitive data)
+        log.info("audit.user.created userId={} username={} email={}", saved.getId(), saved.getUsername(), saved.getEmail());
+        return saved;
     }
 
     public User updateUser(Long id, User u) {
         User user = userRepository.getReferenceById(id);
+        String actor = getCurrentActor();
+        String oldEmail = user.getEmail();
+        String oldPhone = user.getPhoneNumber();
+        boolean passwordWillChange = u.getPassword() != null && !u.getPassword().isBlank() && !passwordEncoder.matches(u.getPassword(), user.getPassword());
+
         updateUserInfo(user, u);
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+
+        // Audit: user updated
+        boolean emailChanged = oldEmail != null ? !oldEmail.equals(saved.getEmail()) : saved.getEmail() != null;
+        boolean phoneChanged = oldPhone != null ? !oldPhone.equals(saved.getPhoneNumber()) : saved.getPhoneNumber() != null;
+        log.info("audit.user.updated targetUserId={} actor={} emailChanged={} phoneChanged={} passwordChanged={}",
+                saved.getId(), actor, emailChanged, phoneChanged, passwordWillChange);
+        return saved;
     }
 
     private void updateUserInfo(User user, User u) {
@@ -67,6 +88,18 @@ public class UserService {
 
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+        // Audit: user deleted
+        String actor = getCurrentActor();
+        log.warn("audit.user.deleted targetUserId={} actor={}", id, actor);
+    }
+
+    private String getCurrentActor() {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            return auth != null ? auth.getName() : "anonymous";
+        } catch (Exception e) {
+            return "unknown";
+        }
     }
 
 }
