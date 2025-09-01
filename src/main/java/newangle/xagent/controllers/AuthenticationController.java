@@ -1,19 +1,30 @@
 package newangle.xagent.controllers;
 
-import newangle.xagent.domain.user.AuthenticationDTO;
-import newangle.xagent.domain.user.RegisterDTO;
 import newangle.xagent.domain.user.User;
-import newangle.xagent.repositories.UserRepository;
+import newangle.xagent.domain.user.dto.AuthenticationDTO;
+import newangle.xagent.domain.user.dto.RegisterDTO;
+import newangle.xagent.domain.user.dto.SignInResponseDTO;
+import newangle.xagent.domain.user.dto.SignUpResponseDTO;
+import newangle.xagent.services.UserService;
+import newangle.xagent.services.exceptions.TooManyRequestsException;
+import newangle.xagent.services.security.LoginAttemptService;
+import newangle.xagent.services.security.TokenService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 @RestController
 public class AuthenticationController {
@@ -22,26 +33,58 @@ public class AuthenticationController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private UserRepository userRepository;
+    private TokenService tokenService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private LoginAttemptService loginAttemptService;
+
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
+
+    @PostMapping("/sign-up")
+    public ResponseEntity<SignUpResponseDTO> signUp(@RequestBody @Valid RegisterDTO data) {
+        User newUser = userService.createUser(data);
+
+        URI uri = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(newUser.getId()).toUri();
+
+        SignUpResponseDTO signUpResponseDTO = new SignUpResponseDTO(newUser);
+
+        // Audit: user signed up
+        log.info("audit.auth.signup userId={} username={} email={}", newUser.getId(), newUser.getUsername(), newUser.getEmail());
+
+        return ResponseEntity.created(uri).body(signUpResponseDTO);
+    }
 
     @PostMapping("/sign-in")
-    public ResponseEntity signIn(@RequestBody AuthenticationDTO data) {
+    public ResponseEntity<SignInResponseDTO> signIn(@RequestBody @Valid AuthenticationDTO data, HttpServletRequest request) {
+        String ip = resolveClientIp(request);
+
+        if (loginAttemptService.isIpBlocked(ip) || loginAttemptService.isUsernameBlocked(data.username()) || loginAttemptService.isIpRateLimited(ip)) {
+            throw new TooManyRequestsException("We were unable to process your request at this time. Try again later.");
+        }
+
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
 
-        return ResponseEntity.ok().build();
+        var token = tokenService.generateToken((User) auth.getPrincipal());
+
+        // Audit: sign-in success (do not log token)
+        log.info("audit.auth.signin.success username={} ip={}", data.username(), ip);
+
+        return ResponseEntity.ok(new SignInResponseDTO(token));
     }
 
-    @PostMapping("/sign-up")
-    public ResponseEntity<User> signUp(@RequestBody RegisterDTO data) {
-        if (this.userRepository.findByUsername(data.username()) != null) return ResponseEntity.badRequest().build();
-
-        String encyptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        User user = new User(data.username(), encyptedPassword, data.role());
-
-        this.userRepository.save(user);
-
-        return ResponseEntity.ok().build();
+    private String resolveClientIp(HttpServletRequest request) {
+        String xf = request.getHeader("X-Forwarded-For");
+        if (xf != null && !xf.isBlank()) {
+            return xf.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
     
 }
