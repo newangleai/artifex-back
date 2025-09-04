@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import newangle.xagent.domain.user.User;
 import newangle.xagent.domain.user.dto.UserResponseDTO;
-import newangle.xagent.domain.user.dto.UserResponseTestDTO;
 import newangle.xagent.services.UserService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,23 +26,23 @@ public class UserController {
     private UserService service;
 
     @GetMapping(value="/users")
-	public ResponseEntity<List<UserResponseTestDTO>> findAll() {
+	public ResponseEntity<List<UserResponseDTO>> findAll() {
 		List<User> list = service.findAll();
-		List<UserResponseTestDTO> resp = list.stream().map(UserResponseTestDTO::from).collect(Collectors.toList());
+		List<UserResponseDTO> resp = list.stream().map(UserResponseDTO::from).collect(Collectors.toList());
 		return ResponseEntity.ok().body(resp);
 	}
 
     @GetMapping(value = "/users/{id}")
-	public ResponseEntity<UserResponseTestDTO> findById(@PathVariable Long id) {
+	public ResponseEntity<UserResponseDTO> findById(@PathVariable Long id) {
 		User obj = service.findById(id);
-		return ResponseEntity.ok().body(UserResponseTestDTO.from(obj));
+		return ResponseEntity.ok().body(UserResponseDTO.from(obj));
 	}
 
     @PutMapping(value="/users/update-account/{id}")
     @PreAuthorize("#id == principal.id or hasRole('ADMIN')")
-    public ResponseEntity<UserResponseTestDTO> updateUserInfo(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<UserResponseDTO> updateUserInfo(@PathVariable Long id, @RequestBody User user) {
         user = service.updateUser(id, user);
-        return ResponseEntity.ok().body(UserResponseTestDTO.from(user));
+        return ResponseEntity.ok().body(UserResponseDTO.from(user));
     }
 
     @DeleteMapping(value="/users/delete-account/{id}")
