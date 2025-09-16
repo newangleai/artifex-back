@@ -15,6 +15,6 @@ public class AgentInterface {
     private String url;
     
     // The transport protocol supported at this URL
-    private TransportProtocol trasnport;
+    private TransportProtocol transport;
     
 }
