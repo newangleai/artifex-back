@@ -20,13 +20,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 
-@RestController
+@RestController("/users")
 public class UserController {
     
     @Autowired
     private UserService service;
 
-    @GetMapping(value="/users")
+    @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<List<UserResponseDTO>> findAll() {
 		List<User> list = service.findAll();
@@ -34,21 +34,21 @@ public class UserController {
 		return ResponseEntity.ok().body(resp);
 	}
 
-    @GetMapping(value = "/users/{id}")
+    @GetMapping(value = "/{id}")
     @PreAuthorize("#id == principal.id or hasRole('ADMIN')")
 	public ResponseEntity<UserResponseDTO> findById(@PathVariable Long id) {
 		User obj = service.findById(id);
 		return ResponseEntity.ok().body(UserResponseDTO.from(obj));
 	}
 
-    @PutMapping(value="/users/update-account/{id}")
+    @PutMapping(value="/update-account/{id}")
     @PreAuthorize("#id == principal.id or hasRole('ADMIN')")
     public ResponseEntity<UserUpdateDTO> updateUserInfo(@PathVariable Long id, @RequestBody User user) {
         user = service.updateUser(id, user);
         return ResponseEntity.ok().body(UserUpdateDTO.from(user));
     }
 
-    @DeleteMapping(value="/users/delete-account/{id}")
+    @DeleteMapping(value="/delete-account/{id}")
     @PreAuthorize("#id == principal.id or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         service.deleteUser(id);
