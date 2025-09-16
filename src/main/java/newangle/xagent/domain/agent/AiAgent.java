@@ -1,6 +1,8 @@
 package newangle.xagent.domain.agent;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -27,12 +29,30 @@ import newangle.xagent.domain.user.User;
 @Table(name = "ai_agents")
 public class AiAgent {
 
+    // === A2A COMPLIANCE ===
+    private String protocolVersion;
+    private String name;
+    private String description;
+    private String url;
+    private TransportProtocol transportProtocol;
+    private AgentInterface agentInterface;
+    private String iconUrl;
+    private AgentProvider provider;
+    private String version;
+    private String documentationUrl;
+    private AgentCapabilities agentCapabilities;
+    // private Map<String, SecurityScheme> securitySchemes; -> A declaration of the security schemes available to authorize requests. The key is the scheme name. Follows the OpenAPI 3.0 Security Scheme Object
+    private List<Map<String, List<String>>> security;
+    private String[] defaultInputModes;
+    private String[] defaultOutputModes;
+    private AgentSkill agentSkill;
+    private Boolean supportsAuthenticatedExtendedCard;
+    private AgentCardSignature signatures;
+    
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private String externalId;
-    private String name;
-    private String description;
     private Instant createdAt;
     
     @JsonBackReference
