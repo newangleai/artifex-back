@@ -27,6 +27,7 @@ public class UserController {
     private UserService service;
 
     @GetMapping(value="/users")
+    @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<List<UserResponseDTO>> findAll() {
 		List<User> list = service.findAll();
 		List<UserResponseDTO> resp = list.stream().map(UserResponseDTO::from).collect(Collectors.toList());
