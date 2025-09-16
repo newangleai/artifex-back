@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import newangle.xagent.domain.user.User;
 import newangle.xagent.domain.user.dto.UserResponseDTO;
 import newangle.xagent.domain.user.dto.UserResponseTestDTO;
+import newangle.xagent.domain.user.dto.UserUpdateDTO;
 import newangle.xagent.services.UserService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -41,9 +42,9 @@ public class UserController {
 
     @PutMapping(value="/users/update-account/{id}")
     @PreAuthorize("#id == principal.id or hasRole('ADMIN')")
-    public ResponseEntity<UserResponseTestDTO> updateUserInfo(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<UserUpdateDTO> updateUserInfo(@PathVariable Long id, @RequestBody User user) {
         user = service.updateUser(id, user);
-        return ResponseEntity.ok().body(UserResponseTestDTO.from(user));
+        return ResponseEntity.ok().body(UserUpdateDTO.from(user));
     }
 
     @DeleteMapping(value="/users/delete-account/{id}")
