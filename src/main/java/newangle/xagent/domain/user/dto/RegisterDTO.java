@@ -19,7 +19,7 @@ public record RegisterDTO(
 
     @NotBlank(message = "password is a required field")
     @Size(min = 8, message = "password must be at least 8 characters")
-    String password 
+    String password
 ) {
     
 }
