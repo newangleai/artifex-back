@@ -15,19 +15,19 @@ import newangle.artifex.domain.user.User;
 @Service
 public class TokenService {
 
-    @Value("${JWT_SECRET:${api.security.token.secret}}")
+    @Value("${JWT_SECRET:super-secret-secret}")
     private String secret;
 
-    @Value("${api.security.token.expiration-hours:24}")
+    @Value("${JWT_EXPIRATION_HOURS:24}")
     private long expirationHours;
 
-    @Value("${JWT_ISSUER:${api.security.token.issuer:x-agent}}")
+    @Value("${JWT_ISSUER:artifex-issuer}")
     private String issuer;
 
-    @Value("${JWT_AUDIENCE:${api.security.token.audience:xagent-users}}")
+    @Value("${JWT_AUDIENCE:artifex-audience}")
     private String audience;
 
-    @Value("${JWT_LEEWAY_SECONDS:${api.security.token.leeway-seconds:60}}")
+    @Value("${JWT_LEEWAY_SECONDS:60}")
     private long leewaySeconds;
     
     public String generateToken(User user) {

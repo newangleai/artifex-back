@@ -28,7 +28,7 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Build, Test, and Verify with Maven
-        run: mvn -B verify
+        run: mvn -B verify -Dspring.profiles.active=testing
 
       # Upload the reports ONLY in case of failure
       - name: Upload test results on failure
