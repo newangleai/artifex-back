@@ -1,0 +1,39 @@
+name: Validate PR for "testing" Branch
+
+on:
+  pull_request:
+    branches: [ testing ]
+
+jobs:
+  build-and-test:
+    name: Build, Test and Verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'zulu'
+
+      # Restores cache BEFORE running Maven
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build, Test, and Verify with Maven
+        run: mvn -B verify
+
+      # Upload the reports ONLY in case of failure
+      - name: Upload test results on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: target/surefire-reports/
