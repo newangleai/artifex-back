@@ -1,7 +1,7 @@
-name: Validate PR for "testing" Branch
+name: Validate push for "testing" Branch
 
 on:
-  pull_request:
+  push:
     branches: [ testing ]
 
 jobs:
