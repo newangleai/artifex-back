@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class XagentApplication {
+public class ArtifexApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(XagentApplication.class, args);
+		SpringApplication.run(ArtifexApplication.class, args);
 	}
 
 }
