@@ -1,7 +1,6 @@
 package newangle.artifex.controllers;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,41 +16,41 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 
-
-@RestController("/users")
+@RestController
+@RequestMapping("/users")
 public class UserController {
-    
+
     @Autowired
-    private UserService service;
+    private UserService userService;
 
-    @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<List<UserResponseDTO>> findAll() {
-		List<User> list = service.findAll();
-		List<UserResponseDTO> resp = list.stream().map(UserResponseDTO::from).collect(Collectors.toList());
-		return ResponseEntity.ok().body(resp);
-	}
+    @GetMapping()
+    public ResponseEntity<List<UserResponseDTO>> findAll() {
+        return ResponseEntity.ok().body(userService.findAll().stream().map(UserResponseDTO::from).toList());
+    }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping("/{id}")
     @PreAuthorize("#id == principal.id or hasRole('ADMIN')")
-	public ResponseEntity<UserResponseDTO> findById(@PathVariable Long id) {
-		User obj = service.findById(id);
-		return ResponseEntity.ok().body(UserResponseDTO.from(obj));
-	}
+    public ResponseEntity<UserResponseDTO> findById(@PathVariable Long id) {
+        User user = userService.findById(id);
+        return ResponseEntity.ok().body(UserResponseDTO.from(user));
+    }
 
-    @PutMapping(value="/update-account/{id}")
+    @PutMapping("/update-account/{id}")
     @PreAuthorize("#id == principal.id or hasRole('ADMIN')")
     public ResponseEntity<UserUpdateDTO> updateUserInfo(@PathVariable Long id, @RequestBody User user) {
-        user = service.updateUser(id, user);
+        user = userService.updateUser(id, user);
         return ResponseEntity.ok().body(UserUpdateDTO.from(user));
     }
 
-    @DeleteMapping(value="/delete-account/{id}")
+    @DeleteMapping("/delete-account/{id}")
     @PreAuthorize("#id == principal.id or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        service.deleteUser(id);
+        userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
